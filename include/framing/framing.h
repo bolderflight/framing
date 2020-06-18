@@ -8,28 +8,32 @@
 #ifndef INCLUDE_FRAMING_FRAMING_H_
 #define INCLUDE_FRAMING_FRAMING_H_
 
+#include <string.h>
 #include <cstdint>
 #include "checksum/checksum.h"
 
 namespace framing {
 
-template<std::size_t BUFFER_SIZE>
-class Transmit {
+template<std::size_t PAYLOAD_SIZE>
+class Writer {
  public:
-  void Write(uint8_t *data, std::size_t len) {
+  std::size_t Write(uint8_t *data, std::size_t len) {
+    if ((len == 0) || (!data) || (len > PAYLOAD_SIZE)) {return 0;}
     /* Reset frame position and checksum */
     frame_pos_ = 0;
     fletcher16.Reset();
     /* Frame start */
     buffer_[frame_pos_++] = FRAME_BYTE_;
     /* Payload */
-    for (std::size_t i = 0; i < len; i++) {
-      checksum_ = fletcher16.Increment(&data[i], 1);
-      if ((data[i] == FRAME_BYTE_) || (data[i] == ESC_BYTE_)) {
+    std::size_t bytes_written;
+    for (bytes_written = 0; bytes_written < len; bytes_written++) {
+      checksum_ = fletcher16.Update(&data[bytes_written], 1);
+      /* Protect against buffer overflow */
+      if ((data[bytes_written] == FRAME_BYTE_) || (data[bytes_written] == ESC_BYTE_)) {
         buffer_[frame_pos_++] = ESC_BYTE_;
-        buffer_[frame_pos_++] = data[i] ^ INVERT_BYTE_;
+        buffer_[frame_pos_++] = data[bytes_written] ^ INVERT_BYTE_;
       } else {
-        buffer_[frame_pos_++] = data[i];
+        buffer_[frame_pos_++] = data[bytes_written];
       }
     }
     /* Checksum */
@@ -45,6 +49,7 @@ class Transmit {
     }
     /* Frame end */
     buffer_[frame_pos_++] = FRAME_BYTE_;
+    return bytes_written;
   }
   std::size_t Size() {
     return frame_pos_;
@@ -54,8 +59,11 @@ class Transmit {
   }
 
  private:
+   /* Header and footer */
+  static const unsigned int HEADER_LEN_ = 1;
+  static const unsigned int MAX_FOOTER_LEN_ = 5;
   /* Data buffer */ 
-  uint8_t buffer_[BUFFER_SIZE];
+  uint8_t buffer_[2 * PAYLOAD_SIZE + HEADER_LEN_ + MAX_FOOTER_LEN_];
   /* Frame position */
   std::size_t frame_pos_ = 0;
   /* Framing */
@@ -68,11 +76,10 @@ class Transmit {
   checksum::Fletcher16 fletcher16;
 };
 
-template<std::size_t BUFFER_SIZE>
-class Receive {
+template<std::size_t PAYLOAD_SIZE>
+class Reader {
  public:
   bool Found(uint8_t byte) {
-    // std::cout << frame_pos_ << std::endl;
     if (frame_pos_ == 0) {
       if (byte == FRAME_BYTE_) {
         buffer_[frame_pos_++] = byte;
@@ -112,7 +119,7 @@ class Receive {
         /* read into buffer */
         buffer_[frame_pos_++] = byte;
       /* prevent buffer overflow */
-      } else if (frame_pos_ >= BUFFER_SIZE) {
+      } else if (frame_pos_ >= BUFFER_SIZE_) {
         frame_pos_ = 0;
         esc_ = false;
       } else {
@@ -122,7 +129,7 @@ class Receive {
     }
     return false;
   }
-  uint8_t Available() {
+  std::size_t Available() {
     return msg_len_;
   }
   uint8_t Read() {
@@ -147,8 +154,13 @@ class Receive {
   }
 
  private:
+   /* Header and footer */
+  static const unsigned int HEADER_LEN_ = 1;
+  static const unsigned int FOOTER_LEN_ = 3;
+  static const unsigned int MAX_FOOTER_LEN_ = 5;
   /* Data buffer */ 
-  uint8_t buffer_[BUFFER_SIZE];
+  static const unsigned int BUFFER_SIZE_ = 2 * PAYLOAD_SIZE + HEADER_LEN_ + MAX_FOOTER_LEN_;
+  uint8_t buffer_[BUFFER_SIZE_];
   /* Frame position */
   std::size_t frame_pos_ = 0;
   std::size_t read_pos_ = 0;
@@ -158,9 +170,6 @@ class Receive {
   static const uint8_t FRAME_BYTE_ = 0x7E;
   static const uint8_t ESC_BYTE_ = 0x7D;
   static const uint8_t INVERT_BYTE_ = 0x20;
-  /* Header and footer */
-  static const unsigned int HEADER_LEN_ = 1;
-  static const unsigned int FOOTER_LEN_ = 3;
   /* Checksum */
   uint16_t checksum_;
   checksum::Fletcher16 fletcher16;
