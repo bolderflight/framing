@@ -8,8 +8,7 @@ Lint:
   tags:
     - bfs
   script: 
-    - cpplint.py --verbose=0 include/checksum/checksum.h
-    - cpplint.py --verbose=0 src/checksum/checksum.cc
+    - cpplint.py --verbose=0 --filter=-whitespace,-line_length include/framing/framing.h
 
 Compile:
   stage: build
@@ -22,11 +21,11 @@ Compile:
     - make
   artifacts:
     paths:
-      - build/checksum_test
+      - build/framing_test
   
 Test Types:
   stage: test
   tags:
     - bfs
   script:
-    - ./build/checksum_test
+    - ./build/framing_test

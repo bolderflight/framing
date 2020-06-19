@@ -15,7 +15,7 @@
 namespace framing {
 
 template<std::size_t PAYLOAD_SIZE>
-class Writer {
+class Encoder {
  public:
   std::size_t Write(uint8_t *data, std::size_t len) {
     if ((len == 0) || (!data) || (len > PAYLOAD_SIZE)) {return 0;}
@@ -59,10 +59,10 @@ class Writer {
   }
 
  private:
-   /* Header and footer */
+  /* Header and footer */
   static const unsigned int HEADER_LEN_ = 1;
   static const unsigned int MAX_FOOTER_LEN_ = 5;
-  /* Data buffer */ 
+  /* Data buffer */
   uint8_t buffer_[2 * PAYLOAD_SIZE + HEADER_LEN_ + MAX_FOOTER_LEN_];
   /* Frame position */
   std::size_t frame_pos_ = 0;
@@ -77,7 +77,7 @@ class Writer {
 };
 
 template<std::size_t PAYLOAD_SIZE>
-class Reader {
+class Decoder {
  public:
   bool Found(uint8_t byte) {
     if (frame_pos_ == 0) {
@@ -94,7 +94,7 @@ class Reader {
           checksum_ = fletcher16.Compute(&buffer_[1], frame_pos_ - FOOTER_LEN_);
           uint16_t received_checksum = static_cast<uint16_t>(buffer_[frame_pos_ - 1]) << 8 | buffer_[frame_pos_ - 2];
           if (checksum_ == received_checksum) {
-            msg_len_ = frame_pos_ - HEADER_LEN_ - FOOTER_LEN_ + 1; // +1 because we didn't step fpos
+            msg_len_ = frame_pos_ - HEADER_LEN_ - FOOTER_LEN_ + 1;  // +1 because we didn't step fpos
             read_pos_ = HEADER_LEN_;
             frame_pos_ = 0;
             esc_ = false;
@@ -149,16 +149,16 @@ class Reader {
     }
     memcpy(data, &buffer_[read_pos_], len);
     read_pos_ += len;
-    msg_len_ -=len;
+    msg_len_ -= len;
     return len;
   }
 
  private:
-   /* Header and footer */
+  /* Header and footer */
   static const unsigned int HEADER_LEN_ = 1;
   static const unsigned int FOOTER_LEN_ = 3;
   static const unsigned int MAX_FOOTER_LEN_ = 5;
-  /* Data buffer */ 
+  /* Data buffer */
   static const unsigned int BUFFER_SIZE_ = 2 * PAYLOAD_SIZE + HEADER_LEN_ + MAX_FOOTER_LEN_;
   uint8_t buffer_[BUFFER_SIZE_];
   /* Frame position */
