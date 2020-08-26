@@ -27,8 +27,9 @@ class Encoder {
     /* Payload */
     std::size_t bytes_written;
     for (bytes_written = 0; bytes_written < len; bytes_written++) {
+      /* Update checksum */
       checksum_ = fletcher16.Update(&data[bytes_written], 1);
-      /* Protect against buffer overflow */
+      /* Write payload */
       if ((data[bytes_written] == FRAME_BYTE_) || (data[bytes_written] == ESC_BYTE_)) {
         buffer_[frame_pos_++] = ESC_BYTE_;
         buffer_[frame_pos_++] = data[bytes_written] ^ INVERT_BYTE_;
@@ -88,11 +89,12 @@ class Decoder {
       if (byte == FRAME_BYTE_) {
         /* frame end */
         if (frame_pos_ == 1) {
-          // Do nothing
+          /* mixup between start and end of packets */
         } else if (frame_pos_ >= HEADER_LEN_ + FOOTER_LEN_ - 1) {
-          /* passed crc check, good packet */
+          /* check the checksums */
           checksum_ = fletcher16.Compute(&buffer_[1], frame_pos_ - FOOTER_LEN_);
           uint16_t received_checksum = static_cast<uint16_t>(buffer_[frame_pos_ - 1]) << 8 | buffer_[frame_pos_ - 2];
+          /* good packet */
           if (checksum_ == received_checksum) {
             msg_len_ = frame_pos_ - HEADER_LEN_ - FOOTER_LEN_ + 1;  // +1 because we didn't step fpos
             read_pos_ = HEADER_LEN_;

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 # Project information
 project(Framing
-  VERSION 1.0
+  VERSION 1.0.0
   DESCRIPTION "Framing"
   LANGUAGES CXX
 )
@@ -10,7 +10,6 @@ include(FetchContent)
 FetchContent_Declare(
 	checksum
 	GIT_REPOSITORY 	git@gitlab.com:bolderflight/software/checksum.git
-	GIT_TAG					v1.0.0
 )
 FetchContent_MakeAvailable(checksum)
 # Add the library target
@@ -22,6 +21,7 @@ target_link_libraries(framing
 )
 # Setup include directories 
 target_include_directories(framing INTERFACE include/)
+
 # Example and unit testing if this project is built separately
 if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
 	# Add the example target
