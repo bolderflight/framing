@@ -75,6 +75,10 @@ framing::Decoder<200> decoder;
 
 **std::size_t Read(uint8_t &ast;data, std::size_t len)** Copies the decoded data payload into the buffer pointed to by *data* up to *len* bytes. Returns the number of bytes read.
 
+**uint8_t &ast;Data()** Returns a pointer to the start of the decoded data payload.
+
+**std::size_t Size()**  Returns the length of the decoded data payload. Equivalent to the *Available* method.
+
 ```C++
 /* Create a decoder class instance with a 200 byte payload buffer */
 uint8_t encoded_data[1000];
