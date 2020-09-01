@@ -154,6 +154,8 @@ class Decoder {
     msg_len_ -= len;
     return len;
   }
+  uint8_t *Data() {return &buffer_[read_pos_];}
+  std::size_t Size() {return msg_len_;}
 
  private:
   /* Header and footer */
