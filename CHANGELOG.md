@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.2
+- Updated CONTRIBUTING
+- Switched from ssh to https for *fetch_content*
+
 ## v1.1.1
 - Updated to MIT license.
 - Specified version for dependencies.
