@@ -2,7 +2,7 @@
 * Brian R Taylor
 * brian.taylor@bolderflight.com
 * 
-* Copyright (c) 2020 Bolder Flight Systems
+* Copyright (c) 2021 Bolder Flight Systems
 */
 
 #ifndef INCLUDE_FRAMING_FRAMING_H_
@@ -30,7 +30,8 @@ class Encoder {
       /* Update checksum */
       checksum_ = fletcher16.Update(&data[bytes_written], 1);
       /* Write payload */
-      if ((data[bytes_written] == FRAME_BYTE_) || (data[bytes_written] == ESC_BYTE_)) {
+      if ((data[bytes_written] == FRAME_BYTE_) ||
+          (data[bytes_written] == ESC_BYTE_)) {
         buffer_[frame_pos_++] = ESC_BYTE_;
         buffer_[frame_pos_++] = data[bytes_written] ^ INVERT_BYTE_;
       } else {
@@ -41,7 +42,8 @@ class Encoder {
     checksum_bytes_[0] = checksum_ & 0xFF;
     checksum_bytes_[1] = checksum_ >> 8 & 0xFF;
     for (std::size_t i = 0; i < sizeof(checksum_bytes_); i++) {
-      if ((checksum_bytes_[i] == FRAME_BYTE_) || (checksum_bytes_[i] == ESC_BYTE_)) {
+      if ((checksum_bytes_[i] == FRAME_BYTE_) ||
+          (checksum_bytes_[i] == ESC_BYTE_)) {
         buffer_[frame_pos_++] = ESC_BYTE_;
         buffer_[frame_pos_++] = checksum_bytes_[i] ^ INVERT_BYTE_;
       } else {
@@ -93,10 +95,13 @@ class Decoder {
         } else if (frame_pos_ >= HEADER_LEN_ + FOOTER_LEN_ - 1) {
           /* check the checksums */
           checksum_ = fletcher16.Compute(&buffer_[1], frame_pos_ - FOOTER_LEN_);
-          uint16_t received_checksum = static_cast<uint16_t>(buffer_[frame_pos_ - 1]) << 8 | buffer_[frame_pos_ - 2];
+          uint16_t received_checksum =
+            static_cast<uint16_t>(buffer_[frame_pos_ - 1]) << 8 |
+                                  buffer_[frame_pos_ - 2];
           /* good packet */
           if (checksum_ == received_checksum) {
-            msg_len_ = frame_pos_ - HEADER_LEN_ - FOOTER_LEN_ + 1;  // +1 because we didn't step fpos
+            /* +1 because we didn't step fpos */
+            msg_len_ = frame_pos_ - HEADER_LEN_ - FOOTER_LEN_ + 1;
             read_pos_ = HEADER_LEN_;
             frame_pos_ = 0;
             esc_ = false;
@@ -163,7 +168,8 @@ class Decoder {
   static const unsigned int FOOTER_LEN_ = 3;
   static const unsigned int MAX_FOOTER_LEN_ = 5;
   /* Data buffer */
-  static const unsigned int BUFFER_SIZE_ = 2 * PAYLOAD_SIZE + HEADER_LEN_ + MAX_FOOTER_LEN_;
+  static const unsigned int BUFFER_SIZE_ = 2 * PAYLOAD_SIZE + HEADER_LEN_
+                                           + MAX_FOOTER_LEN_;
   uint8_t buffer_[BUFFER_SIZE_];
   /* Frame position */
   std::size_t frame_pos_ = 0;
