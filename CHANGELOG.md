@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.3
+- Updated CONTRIBUTING
+- Switched to get *checksum* library from GitHub
+
 ## v1.1.2
 - Updated CONTRIBUTING
 - Switched from ssh to https for *fetch_content*

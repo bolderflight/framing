@@ -8,7 +8,7 @@ Lint:
   tags:
     - bfs
   script: 
-    - cpplint.py --verbose=0 --filter=-whitespace,-line_length include/framing/framing.h
+    - cpplint.py --verbose=0 include/framing/framing.h
 
 Compile:
   stage: build
