@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.0
+- Updated namespace to *bfs*
+- Updated for checksum v2.0.0
+
 ## v1.1.3
 - Updated CONTRIBUTING
 - Switched to get *checksum* library from GitHub

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 # Project information
 project(Framing
-  VERSION 1.1.3
+  VERSION 2.0.0
   DESCRIPTION "Framing"
   LANGUAGES CXX
 )
@@ -10,7 +10,7 @@ include(FetchContent)
 FetchContent_Declare(
 	checksum
 	GIT_REPOSITORY 	https://github.com/bolderflight/checksum.git
-	GIT_TAG v1.0.3
+	GIT_TAG v2.0.0
 )
 FetchContent_MakeAvailable(checksum)
 # Add the library target

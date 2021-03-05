@@ -2,7 +2,25 @@
 * Brian R Taylor
 * brian.taylor@bolderflight.com
 * 
-* Copyright (c) 2020 Bolder Flight Systems
+* Copyright (c) 2021 Bolder Flight Systems Inc
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the “Software”), to
+* deal in the Software without restriction, including without limitation the
+* rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+* sell copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+* IN THE SOFTWARE.
 */
 
 #include "framing/framing.h"
@@ -11,25 +29,25 @@
 
 /* Test encoder nullptr */
 TEST(Encoder, NullPtr) {
-  framing::Encoder<10> encoder;
+  bfs::Encoder<10> encoder;
   EXPECT_EQ(0, encoder.Write(nullptr, 10));
 }
 /* Test Encoder 0 len */
 TEST(Encoder, Len0) {
-  framing::Encoder<10> encoder;
+  bfs::Encoder<10> encoder;
   uint8_t data[0];
   EXPECT_EQ(0, encoder.Write(data, sizeof(data)));
 }
 /* Test Encoder, buffer too small */
 TEST(Encoder, SmallBuff) {
-  framing::Encoder<5> encoder;
+  bfs::Encoder<5> encoder;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   EXPECT_EQ(0, encoder.Write(data, sizeof(data)));
 }
 /* Test Encoder, good inputs */
 TEST(Encoder, Good) {
-  framing::Encoder<100> encoder;
-  checksum::Fletcher16 chk;
+  bfs::Encoder<100> encoder;
+  bfs::Fletcher16 chk;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   uint16_t checksum = chk.Compute(data, sizeof(data));
   EXPECT_EQ(10, encoder.Write(data, sizeof(data)));
@@ -51,24 +69,24 @@ TEST(Encoder, Good) {
 }
 /* Test Decoder, null ptr */
 TEST(Decoder, NullPtr) {
-  framing::Decoder<100> decoder;
+  bfs::Decoder<100> decoder;
   EXPECT_EQ(0, decoder.Read(nullptr, 10));
 }
 /* Test Decoder 0 len */
 TEST(Decoder, Len0) {
-  framing::Decoder<100> decoder;
+  bfs::Decoder<100> decoder;
   uint8_t data[0];
   EXPECT_EQ(0, decoder.Read(data, sizeof(data)));
 }
 /* Test good decoder */
 TEST(Decoder, Good) {
-  framing::Encoder<100> encoder;
+  bfs::Encoder<100> encoder;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   uint8_t read_data[20];
   std::size_t bytes_avail = 0;
   std::size_t bytes_read = 0;
   encoder.Write(data, sizeof(data));
-  framing::Decoder<100> decoder;
+  bfs::Decoder<100> decoder;
   for (std::size_t i = 0; i < encoder.Size(); i++) {
     if (decoder.Found(*(encoder.Data() + i))) {
       bytes_avail = decoder.Available();
@@ -83,13 +101,13 @@ TEST(Decoder, Good) {
 }
 /* Test Decoder smaller buffer */
 TEST(Decoder, SmallBuff) {
-  framing::Encoder<100> encoder;
+  bfs::Encoder<100> encoder;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   uint8_t read_data[5];
   std::size_t bytes_avail = 0;
   std::size_t bytes_read = 0;
   encoder.Write(data, sizeof(data));
-  framing::Decoder<100> decoder;
+  bfs::Decoder<100> decoder;
   for (std::size_t i = 0; i < encoder.Size(); i++) {
     if (decoder.Found(*(encoder.Data() + i))) {
       bytes_avail = decoder.Available();
@@ -107,7 +125,7 @@ TEST(Decoder, SmallBuff) {
 }
 /* Test Decoder empty */
 TEST(Decoder, Empty) {
-  framing::Decoder<100> decoder;
+  bfs::Decoder<100> decoder;
   uint8_t data[10];
   EXPECT_EQ(0, decoder.Available());
   EXPECT_EQ(0, decoder.Read());
