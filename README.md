@@ -21,7 +21,7 @@ make
 This will build the library, an example executable called *framing_example*, and an executable for testing using the Google Test framework, called *framing_test*. The example executable source file is located at *examples/framing_example.cc*.
 
 ## Namespace
-This library is within the namespace *framing*.
+This library is within the namespace *bfs*.
 
 # Encoder
 This class is used for encoding data payloads. Data payloads are framed by:
@@ -37,7 +37,7 @@ An escape character of 0x7D is used to escape any occurances of 0x7E or 0x7D in 
 **Encoder<PAYLOAD_SIZE>** Creates an Encoder object, PAYLOAD_SIZE is a template parameter used to set the number of bytes in the largest payload that will be encoded. This class will reserve a buffer that is 2 * PAYLOAD_SIZE + 5 bytes long, which guarantees that all data payloads up to PAYLOAD_SIZE long can be encoded, leaving enough buffer for escape characters, checksum, header and footer bytes.
 
 ```C++
-framing::Encoder<200> encoder;
+bfs::Encoder<200> encoder;
 ```
 
 **std::size_t Write(uint8_t &ast;data, std::size_t len)** Encodes the data passed by a pointer to the payload data and length. Returns the number of payload bytes encoded.
@@ -63,7 +63,7 @@ This class is used for decoding data payloads from encoded packets.
 **Decoder<PAYLOAD_SIZE>** Creates a Decoder object, PAYLOAD_SIZE is a template parameter used to set the number of bytes in the largest payload that will be decoded. This class will reserve a buffer that is 2 * PAYLOAD_SIZE + 5 bytes long, which guarantees that all data payloads up to PAYLOAD_SIZE long can be decoded, leaving enough buffer for escape characters, checksum, header and footer bytes.
 
 ```C++
-framing::Decoder<200> decoder;
+bfs::Decoder<200> decoder;
 ```
 
 **bool Found(uint8_t byte)** Searches for valid data payloads, given a stream of encoded bytes, returning true when one is found.
@@ -81,7 +81,7 @@ framing::Decoder<200> decoder;
 ```C++
 /* Create a decoder class instance with a 200 byte payload buffer */
 uint8_t encoded_data[1000];
-framing::Decoder<200> decoder;
+bfs::Decoder<200> decoder;
 uint8_t read[200];
 /* Search for a good frame */
 for (std::size_t i = 0; i < sizeof(encoded_data); i++) {
