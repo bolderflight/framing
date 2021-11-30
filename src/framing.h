@@ -23,19 +23,19 @@
 * IN THE SOFTWARE.
 */
 
-#ifndef INCLUDE_FRAMING_FRAMING_H_
-#define INCLUDE_FRAMING_FRAMING_H_
+#ifndef SRC_FRAMING_H_
+#define SRC_FRAMING_H_
 
-#include <string.h>
+#include <cstring>
 #include <cstdint>
-#include "checksum/checksum.h"
+#include "checksum.h"  // NOLINT
 
 namespace bfs {
 
 template<std::size_t PAYLOAD_SIZE>
-class Encoder {
+class FrameEncoder {
  public:
-  std::size_t Write(uint8_t *data, std::size_t len) {
+  std::size_t Write(uint8_t const * data, const std::size_t len) {
     if ((len == 0) || (!data) || (len > PAYLOAD_SIZE)) {return 0;}
     /* Reset frame position and checksum */
     frame_pos_ = 0;
@@ -72,10 +72,10 @@ class Encoder {
     buffer_[frame_pos_++] = FRAME_BYTE_;
     return bytes_written;
   }
-  std::size_t Size() {
+  std::size_t size() const {
     return frame_pos_;
   }
-  uint8_t *Data() {
+  const uint8_t *data() const {
     return buffer_;
   }
 
@@ -98,7 +98,7 @@ class Encoder {
 };
 
 template<std::size_t PAYLOAD_SIZE>
-class Decoder {
+class FrameDecoder {
  public:
   bool Found(uint8_t byte) {
     if (frame_pos_ == 0) {
@@ -154,7 +154,7 @@ class Decoder {
     }
     return false;
   }
-  std::size_t Available() {
+  std::size_t available() const {
     return msg_len_;
   }
   uint8_t Read() {
@@ -177,8 +177,8 @@ class Decoder {
     msg_len_ -= len;
     return len;
   }
-  uint8_t *Data() {return &buffer_[read_pos_];}
-  std::size_t Size() {return msg_len_;}
+  const uint8_t *data() const {return &buffer_[read_pos_];}
+  std::size_t size() const {return msg_len_;}
 
  private:
   /* Header and footer */
@@ -205,4 +205,4 @@ class Decoder {
 
 }  // namespace bfs
 
-#endif  // INCLUDE_FRAMING_FRAMING_H_
+#endif  // SRC_FRAMING_H_

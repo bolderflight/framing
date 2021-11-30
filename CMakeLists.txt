@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 # Project information
 project(Framing
-  VERSION 2.0.0
+  VERSION 3.0.0
   DESCRIPTION "Framing"
   LANGUAGES CXX
 )
@@ -9,8 +9,8 @@ project(Framing
 include(FetchContent)
 FetchContent_Declare(
 	checksum
-	GIT_REPOSITORY 	https://github.com/bolderflight/checksum.git
-	GIT_TAG v2.0.0
+	GIT_REPOSITORY https://github.com/bolderflight/checksum.git
+	GIT_TAG v3.0.0
 )
 FetchContent_MakeAvailable(checksum)
 # Add the library target
@@ -21,12 +21,12 @@ target_link_libraries(framing
 		checksum
 )
 # Setup include directories 
-target_include_directories(framing INTERFACE include/)
+target_include_directories(framing INTERFACE src/)
 
 # Example and unit testing if this project is built separately
 if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
 	# Add the example target
-	add_executable(framing_example examples/framing_example.cc)
+	add_executable(framing_example examples/cmake/framing_example.cc)
 	# Add the includes
 	target_include_directories(framing_example PUBLIC 
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -41,8 +41,8 @@ if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
 	include(FetchContent)
 	FetchContent_Declare(
 		googletest
-		GIT_REPOSITORY 	https://github.com/google/googletest.git
-		GIT_TAG					release-1.10.0
+		GIT_REPOSITORY https://github.com/google/googletest.git
+		GIT_TAG release-1.10.0
 	)
 	FetchContent_MakeAvailable(googletest)
 	enable_testing()
