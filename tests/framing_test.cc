@@ -23,73 +23,72 @@
 * IN THE SOFTWARE.
 */
 
-#include "framing/framing.h"
+#include "framing.h"
 #include "gtest/gtest.h"
-#include "framing/framing.h"
 
 /* Test encoder nullptr */
 TEST(Encoder, NullPtr) {
-  bfs::Encoder<10> encoder;
+  bfs::FrameEncoder<10> encoder;
   EXPECT_EQ(0, encoder.Write(nullptr, 10));
 }
 /* Test Encoder 0 len */
 TEST(Encoder, Len0) {
-  bfs::Encoder<10> encoder;
+  bfs::FrameEncoder<10> encoder;
   uint8_t data[0];
   EXPECT_EQ(0, encoder.Write(data, sizeof(data)));
 }
 /* Test Encoder, buffer too small */
 TEST(Encoder, SmallBuff) {
-  bfs::Encoder<5> encoder;
+  bfs::FrameEncoder<5> encoder;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   EXPECT_EQ(0, encoder.Write(data, sizeof(data)));
 }
 /* Test Encoder, good inputs */
 TEST(Encoder, Good) {
-  bfs::Encoder<100> encoder;
+  bfs::FrameEncoder<100> encoder;
   bfs::Fletcher16 chk;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   uint16_t checksum = chk.Compute(data, sizeof(data));
   EXPECT_EQ(10, encoder.Write(data, sizeof(data)));
-  EXPECT_EQ(14, encoder.Size());
-  EXPECT_EQ(126, *(encoder.Data() + 0));
-  EXPECT_EQ(1, *(encoder.Data() + 1));
-  EXPECT_EQ(2, *(encoder.Data() + 2));
-  EXPECT_EQ(3, *(encoder.Data() + 3));
-  EXPECT_EQ(4, *(encoder.Data() + 4));
-  EXPECT_EQ(5, *(encoder.Data() + 5));
-  EXPECT_EQ(6, *(encoder.Data() + 6));
-  EXPECT_EQ(7, *(encoder.Data() + 7));
-  EXPECT_EQ(8, *(encoder.Data() + 8));
-  EXPECT_EQ(9, *(encoder.Data() + 9));
-  EXPECT_EQ(10, *(encoder.Data() + 10));
-  EXPECT_EQ(checksum & 0xFF, *(encoder.Data() + 11));
-  EXPECT_EQ(checksum >> 8 & 0xFF, *(encoder.Data() + 12));
-  EXPECT_EQ(126, *(encoder.Data() + 13));
+  EXPECT_EQ(14, encoder.size());
+  EXPECT_EQ(126, *(encoder.data() + 0));
+  EXPECT_EQ(1, *(encoder.data() + 1));
+  EXPECT_EQ(2, *(encoder.data() + 2));
+  EXPECT_EQ(3, *(encoder.data() + 3));
+  EXPECT_EQ(4, *(encoder.data() + 4));
+  EXPECT_EQ(5, *(encoder.data() + 5));
+  EXPECT_EQ(6, *(encoder.data() + 6));
+  EXPECT_EQ(7, *(encoder.data() + 7));
+  EXPECT_EQ(8, *(encoder.data() + 8));
+  EXPECT_EQ(9, *(encoder.data() + 9));
+  EXPECT_EQ(10, *(encoder.data() + 10));
+  EXPECT_EQ(checksum & 0xFF, *(encoder.data() + 11));
+  EXPECT_EQ(checksum >> 8 & 0xFF, *(encoder.data() + 12));
+  EXPECT_EQ(126, *(encoder.data() + 13));
 }
 /* Test Decoder, null ptr */
 TEST(Decoder, NullPtr) {
-  bfs::Decoder<100> decoder;
+  bfs::FrameDecoder<100> decoder;
   EXPECT_EQ(0, decoder.Read(nullptr, 10));
 }
 /* Test Decoder 0 len */
 TEST(Decoder, Len0) {
-  bfs::Decoder<100> decoder;
+  bfs::FrameDecoder<100> decoder;
   uint8_t data[0];
   EXPECT_EQ(0, decoder.Read(data, sizeof(data)));
 }
 /* Test good decoder */
 TEST(Decoder, Good) {
-  bfs::Encoder<100> encoder;
+  bfs::FrameEncoder<100> encoder;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   uint8_t read_data[20];
   std::size_t bytes_avail = 0;
   std::size_t bytes_read = 0;
   encoder.Write(data, sizeof(data));
-  bfs::Decoder<100> decoder;
-  for (std::size_t i = 0; i < encoder.Size(); i++) {
-    if (decoder.Found(*(encoder.Data() + i))) {
-      bytes_avail = decoder.Available();
+  bfs::FrameDecoder<100> decoder;
+  for (std::size_t i = 0; i < encoder.size(); i++) {
+    if (decoder.Found(*(encoder.data() + i))) {
+      bytes_avail = decoder.available();
       bytes_read = decoder.Read(read_data, sizeof(read_data));
     }
   }
@@ -101,16 +100,16 @@ TEST(Decoder, Good) {
 }
 /* Test Decoder smaller buffer */
 TEST(Decoder, SmallBuff) {
-  bfs::Encoder<100> encoder;
+  bfs::FrameEncoder<100> encoder;
   uint8_t data[] = {1,2,3,4,5,6,7,8,9,10};
   uint8_t read_data[5];
   std::size_t bytes_avail = 0;
   std::size_t bytes_read = 0;
   encoder.Write(data, sizeof(data));
-  bfs::Decoder<100> decoder;
-  for (std::size_t i = 0; i < encoder.Size(); i++) {
-    if (decoder.Found(*(encoder.Data() + i))) {
-      bytes_avail = decoder.Available();
+  bfs::FrameDecoder<100> decoder;
+  for (std::size_t i = 0; i < encoder.size(); i++) {
+    if (decoder.Found(*(encoder.data() + i))) {
+      bytes_avail = decoder.available();
       bytes_read = decoder.Read(read_data, sizeof(read_data));
     }
   }
@@ -125,9 +124,9 @@ TEST(Decoder, SmallBuff) {
 }
 /* Test Decoder empty */
 TEST(Decoder, Empty) {
-  bfs::Decoder<100> decoder;
+  bfs::FrameDecoder<100> decoder;
   uint8_t data[10];
-  EXPECT_EQ(0, decoder.Available());
+  EXPECT_EQ(0, decoder.available());
   EXPECT_EQ(0, decoder.Read());
   EXPECT_EQ(0, decoder.Read(data, sizeof(data)));
 }
