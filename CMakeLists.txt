@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 # Project information
 project(Framing
-  VERSION 3.0.0
+  VERSION 3.0.1
   DESCRIPTION "Framing"
   LANGUAGES CXX
 )

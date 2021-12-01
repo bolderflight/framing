@@ -26,6 +26,9 @@
 #ifndef SRC_FRAMING_H_
 #define SRC_FRAMING_H_
 
+#if defined(ARDUINO)
+#include <Arduino.h>
+#endif
 #include <cstring>
 #include <cstdint>
 #include "checksum.h"  // NOLINT
