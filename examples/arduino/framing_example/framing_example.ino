@@ -36,7 +36,6 @@ void setup() {
   Serial.println(bytes_written);
   Serial.print("Encoder buffer size: ");
   Serial.println(encoder.size());
-
   /* Create a decoder class instance with a 200 byte payload buffer */
   bfs::FrameDecoder<200> decoder;
   uint8_t read[200];

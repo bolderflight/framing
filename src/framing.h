@@ -31,6 +31,7 @@
 #endif
 #include <cstring>
 #include <cstdint>
+#include <array>
 #include "checksum.h"  // NOLINT
 
 namespace bfs {
@@ -38,7 +39,7 @@ namespace bfs {
 template<std::size_t PAYLOAD_SIZE>
 class FrameEncoder {
  public:
-  std::size_t Write(uint8_t const * data, const std::size_t len) {
+  std::size_t Write(uint8_t const * const data, const std::size_t len) {
     if ((len == 0) || (!data) || (len > PAYLOAD_SIZE)) {return 0;}
     /* Reset frame position and checksum */
     frame_pos_ = 0;
@@ -75,10 +76,14 @@ class FrameEncoder {
     buffer_[frame_pos_++] = FRAME_BYTE_;
     return bytes_written;
   }
+  template<std::size_t N>
+  std::size_t Write(const std::array<uint8_t, N> &ref) {
+    return Write(ref.data(), ref.size());
+  }
   std::size_t size() const {
     return frame_pos_;
   }
-  const uint8_t *data() const {
+  uint8_t const * const data() const {
     return buffer_;
   }
 
@@ -168,7 +173,7 @@ class FrameDecoder {
       return 0;
     }
   }
-  std::size_t Read(uint8_t *data, std::size_t len) {
+  std::size_t Read(uint8_t * const data, std::size_t len) {
     if ((len == 0) || (!data)) {
       return 0;
     }
@@ -180,7 +185,7 @@ class FrameDecoder {
     msg_len_ -= len;
     return len;
   }
-  const uint8_t *data() const {return &buffer_[read_pos_];}
+  uint8_t const * const data() const {return &buffer_[read_pos_];}
   std::size_t size() const {return msg_len_;}
 
  private:

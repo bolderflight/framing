@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.0
+- Fixed pointer constness
+- Added std::array methods
+
 ## v3.0.1
 - Conditionally include Arduino header
 
