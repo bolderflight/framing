@@ -55,16 +55,18 @@ An escape character of 0x7D is used to escape any occurances of 0x7E or 0x7D in 
 bfs::FrameEncoder<200> encoder;
 ```
 
-**std::size_t Write(uint8_t const &ast; data, const std::size_t len)** Encodes the data passed by a pointer to the payload data and length. Returns the number of payload bytes encoded.
+**std::size_t Write(uint8_t const &ast; const data, const std::size_t len)** Encodes the data passed by a pointer to the payload data and length. Returns the number of payload bytes encoded.
 
 ```C++
 uint8_t data[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 std::size_t bytes_written = encoder.Write(data, sizeof(data));
 ```
 
+**std::size_t Write(const std::array<uint8_t, N> &ref)** Same as the previous *Write* method, but takes a const reference to a *std::array* of data.
+
 **std::size_t size()** Returns the size of the encoded buffer, including the header, footer, checksum, and escape bytes. This is the total size of the buffer to be transmitted or stored.
 
-**uint8_t &ast;data()** Returns a pointer to the encoded buffer. Use along with the *size* method to transmit or store the encoded data.
+**uint8_t const &ast; const data()** Returns a pointer to the encoded buffer. Use along with the *size* method to transmit or store the encoded data.
 
 ```C++
 fwrite(encoder.data(), encoder.size(), 1, fd);
@@ -87,9 +89,9 @@ bfs::FrameDecoder<200> decoder;
 
 **uint8_t Read()** Returns a single byte from the decoded data payload.
 
-**std::size_t Read(uint8_t &ast;data, std::size_t len)** Copies the decoded data payload into the buffer pointed to by *data* up to *len* bytes. Returns the number of bytes read.
+**std::size_t Read(uint8_t &ast; const data, std::size_t len)** Copies the decoded data payload into the buffer pointed to by *data* up to *len* bytes. Returns the number of bytes read.
 
-**uint8_t &ast;data()** Returns a pointer to the start of the decoded data payload.
+**uint8_t const &ast; const data()** Returns a pointer to the start of the decoded data payload.
 
 **std::size_t size()**  Returns the length of the decoded data payload. Equivalent to the *available* method.
 
