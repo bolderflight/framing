@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.1
+- Updated CMake minimum version to 3.14 to support FetchContent_MakeAvailable
+- Updated checksum to v3.1.1
+
 ## v3.1.0
 - Fixed pointer constness
 - Added std::array methods
