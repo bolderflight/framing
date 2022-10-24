@@ -3,7 +3,7 @@
 ![Bolder Flight Systems Logo](img/logo-words_75.png) &nbsp; &nbsp; ![Arduino Logo](img/arduino_logo_75.png)
 
 # Framing
-This library frames data payloads with a start byte, end byte, and checksum; making data suitable for serial transmission or storage and providing a framework for quickly developing messages. Classes and methods are provided for encoding and decoding data payloads. This library is compatible with Arduino ARM and with CMake build systems. It would also be easy to include with other projects, since it is a header only library consisting of a single file.
+This library frames data payloads with a start byte, end byte, and checksum; making data suitable for serial transmission or storage and providing a framework for quickly developing messages. Classes and methods are provided for encoding and decoding data payloads. This library is compatible with Arduino and with CMake build systems. It would also be easy to include with other projects, since it is a header only library consisting of a single file.
    * [License](LICENSE.md)
    * [Changelog](CHANGELOG.md)
    * [Contributing guide](CONTRIBUTING.md)
@@ -17,7 +17,7 @@ Use the Arduino Library Manager to install this library or clone to your Arduino
 #include "framing.h"
 ```
 
-An example Arduino executable is located at *examples/arduino/framing_example/framing_example.ino*. Teensy 3.x, 4.x, and LC devices are used for testing under Arduino and this library should be compatible with other ARM devices. This library is *not* expected to work on AVR devices.
+An example Arduino executable is located at *examples/arduino/framing_example/framing_example.ino*. Teensy 3.x, 4.x, and LC devices are used for testing under Arduino and this library should be compatible with other Arduino devices.
 
 ## CMake
 CMake is used to build this library, which is exported as a library target called *framing*. The header is added as:
@@ -55,16 +55,14 @@ An escape character of 0x7D is used to escape any occurances of 0x7E or 0x7D in 
 bfs::FrameEncoder<200> encoder;
 ```
 
-**std::size_t Write(uint8_t const &ast; const data, const std::size_t len)** Encodes the data passed by a pointer to the payload data and length. Returns the number of payload bytes encoded.
+**size_t Write(uint8_t const &ast; const data, const size_t len)** Encodes the data passed by a pointer to the payload data and length. Returns the number of payload bytes encoded.
 
 ```C++
 uint8_t data[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-std::size_t bytes_written = encoder.Write(data, sizeof(data));
+size_t bytes_written = encoder.Write(data, sizeof(data));
 ```
 
-**std::size_t Write(const std::array<uint8_t, N> &ref)** Same as the previous *Write* method, but takes a const reference to a *std::array* of data.
-
-**std::size_t size()** Returns the size of the encoded buffer, including the header, footer, checksum, and escape bytes. This is the total size of the buffer to be transmitted or stored.
+**size_t size()** Returns the size of the encoded buffer, including the header, footer, checksum, and escape bytes. This is the total size of the buffer to be transmitted or stored.
 
 **uint8_t const &ast; const data()** Returns a pointer to the encoded buffer. Use along with the *size* method to transmit or store the encoded data.
 
@@ -85,15 +83,15 @@ bfs::FrameDecoder<200> decoder;
 
 **bool Found(uint8_t byte)** Searches for valid data payloads, given a stream of encoded bytes, returning true when one is found.
 
-**std::size_t available()** Returns the size of the decoded data payload, in bytes. If some of the data payload has been read, using the *Read* methods described below, returns the number of bytes remaining in the data payload.
+**size_t available()** Returns the size of the decoded data payload, in bytes. If some of the data payload has been read, using the *Read* methods described below, returns the number of bytes remaining in the data payload.
 
 **uint8_t Read()** Returns a single byte from the decoded data payload.
 
-**std::size_t Read(uint8_t &ast; const data, std::size_t len)** Copies the decoded data payload into the buffer pointed to by *data* up to *len* bytes. Returns the number of bytes read.
+**size_t Read(uint8_t &ast; const data, size_t len)** Copies the decoded data payload into the buffer pointed to by *data* up to *len* bytes. Returns the number of bytes read.
 
 **uint8_t const &ast; const data()** Returns a pointer to the start of the decoded data payload.
 
-**std::size_t size()**  Returns the length of the decoded data payload. Equivalent to the *available* method.
+**size_t size()**  Returns the length of the decoded data payload. Equivalent to the *available* method.
 
 ```C++
 /* Create a decoder class instance with a 200 byte payload buffer */
@@ -101,13 +99,13 @@ uint8_t encoded_data[1000];
 bfs::FrameDecoder<200> decoder;
 uint8_t read[200];
 /* Search for a good frame */
-for (std::size_t i = 0; i < sizeof(encoded_data); i++) {
+for (size_t i = 0; i < sizeof(encoded_data); i++) {
   /* Data packet found */
   if (decoder.Found(encoded_data[i])) {
-    std::size_t bytes_read = decoder.Read(read, sizeof(read));
+    size_t bytes_read = decoder.Read(read, sizeof(read));
     std::cout << "Payload bytes read: " << bytes_read << std::endl;
     std::cout << "Payload bytes: " << std::endl;
-    for (std::size_t i = 0; i < bytes_read; i++) {
+    for (size_t i = 0; i < bytes_read; i++) {
       std::cout << std::to_string(read[i]) << std::endl;
     }
   }

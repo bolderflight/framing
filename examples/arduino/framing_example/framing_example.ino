@@ -2,7 +2,7 @@
 * Brian R Taylor
 * brian.taylor@bolderflight.com
 * 
-* Copyright (c) 2021 Bolder Flight Systems Inc
+* Copyright (c) 2022 Bolder Flight Systems Inc
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the “Software”), to
@@ -23,7 +23,6 @@
 * IN THE SOFTWARE.
 */
 
-#include <cstring>
 #include "framing.h"
 
 void setup() {
@@ -31,7 +30,7 @@ void setup() {
   bfs::FrameEncoder<200> encoder;
   uint8_t data[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   /* Write 10 bytes of data into the buffer */
-  std::size_t bytes_written = encoder.Write(data, sizeof(data));
+  size_t bytes_written = encoder.Write(data, sizeof(data));
   Serial.print("Payload bytes written: ");
   Serial.println(bytes_written);
   Serial.print("Encoder buffer size: ");
@@ -40,14 +39,14 @@ void setup() {
   bfs::FrameDecoder<200> decoder;
   uint8_t read[200];
   /* Search for a good frame */
-  for (std::size_t i = 0; i < 200; i++) {
+  for (size_t i = 0; i < 200; i++) {
     /* Data packet found */
     if (decoder.Found(*(encoder.data() + i))) {
-      std::size_t bytes_read = decoder.Read(read, sizeof(read));
+      size_t bytes_read = decoder.Read(read, sizeof(read));
       Serial.print("Payload bytes read: ");
       Serial.println(bytes_read);
       Serial.println("Payload bytes: ");
-      for (std::size_t i = 0; i < bytes_read; i++) {
+      for (size_t i = 0; i < bytes_read; i++) {
         Serial.println(read[i]);
       }
     }

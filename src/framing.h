@@ -2,7 +2,7 @@
 * Brian R Taylor
 * brian.taylor@bolderflight.com
 * 
-* Copyright (c) 2021 Bolder Flight Systems Inc
+* Copyright (c) 2022 Bolder Flight Systems Inc
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the “Software”), to
@@ -28,18 +28,18 @@
 
 #if defined(ARDUINO)
 #include <Arduino.h>
-#endif
+#else
 #include <cstring>
 #include <cstdint>
-#include <array>
+#endif
 #include "checksum.h"  // NOLINT
 
 namespace bfs {
 
-template<std::size_t PAYLOAD_SIZE>
+template<size_t PAYLOAD_SIZE>
 class FrameEncoder {
  public:
-  std::size_t Write(uint8_t const * const data, const std::size_t len) {
+  size_t Write(uint8_t const * const data, const size_t len) {
     if ((len == 0) || (!data) || (len > PAYLOAD_SIZE)) {return 0;}
     /* Reset frame position and checksum */
     frame_pos_ = 0;
@@ -47,7 +47,7 @@ class FrameEncoder {
     /* Frame start */
     buffer_[frame_pos_++] = FRAME_BYTE_;
     /* Payload */
-    std::size_t bytes_written;
+    size_t bytes_written;
     for (bytes_written = 0; bytes_written < len; bytes_written++) {
       /* Update checksum */
       checksum_ = fletcher16.Update(&data[bytes_written], 1);
@@ -63,7 +63,7 @@ class FrameEncoder {
     /* Checksum */
     checksum_bytes_[0] = checksum_ & 0xFF;
     checksum_bytes_[1] = checksum_ >> 8 & 0xFF;
-    for (std::size_t i = 0; i < sizeof(checksum_bytes_); i++) {
+    for (size_t i = 0; i < sizeof(checksum_bytes_); i++) {
       if ((checksum_bytes_[i] == FRAME_BYTE_) ||
           (checksum_bytes_[i] == ESC_BYTE_)) {
         buffer_[frame_pos_++] = ESC_BYTE_;
@@ -76,11 +76,7 @@ class FrameEncoder {
     buffer_[frame_pos_++] = FRAME_BYTE_;
     return bytes_written;
   }
-  template<std::size_t N>
-  std::size_t Write(const std::array<uint8_t, N> &ref) {
-    return Write(ref.data(), ref.size());
-  }
-  std::size_t size() const {
+  size_t size() const {
     return frame_pos_;
   }
   uint8_t const * const data() const {
@@ -94,7 +90,7 @@ class FrameEncoder {
   /* Data buffer */
   uint8_t buffer_[2 * PAYLOAD_SIZE + HEADER_LEN_ + MAX_FOOTER_LEN_];
   /* Frame position */
-  std::size_t frame_pos_ = 0;
+  size_t frame_pos_ = 0;
   /* Framing */
   static const uint8_t FRAME_BYTE_ = 0x7E;
   static const uint8_t ESC_BYTE_ = 0x7D;
@@ -105,7 +101,7 @@ class FrameEncoder {
   Fletcher16 fletcher16;
 };
 
-template<std::size_t PAYLOAD_SIZE>
+template<size_t PAYLOAD_SIZE>
 class FrameDecoder {
  public:
   bool Found(uint8_t byte) {
@@ -162,7 +158,7 @@ class FrameDecoder {
     }
     return false;
   }
-  std::size_t available() const {
+  size_t available() const {
     return msg_len_;
   }
   uint8_t Read() {
@@ -173,7 +169,7 @@ class FrameDecoder {
       return 0;
     }
   }
-  std::size_t Read(uint8_t * const data, std::size_t len) {
+  size_t Read(uint8_t * const data, size_t len) {
     if ((len == 0) || (!data)) {
       return 0;
     }
@@ -186,7 +182,7 @@ class FrameDecoder {
     return len;
   }
   uint8_t const * const data() const {return &buffer_[read_pos_];}
-  std::size_t size() const {return msg_len_;}
+  size_t size() const {return msg_len_;}
 
  private:
   /* Header and footer */
@@ -198,11 +194,11 @@ class FrameDecoder {
                                            + MAX_FOOTER_LEN_;
   uint8_t buffer_[BUFFER_SIZE_];
   /* Frame position */
-  std::size_t frame_pos_ = 0;
-  std::size_t read_pos_ = 0;
+  size_t frame_pos_ = 0;
+  size_t read_pos_ = 0;
   /* Framing */
   bool esc_ = false;
-  std::size_t msg_len_ = 0;
+  size_t msg_len_ = 0;
   static const uint8_t FRAME_BYTE_ = 0x7E;
   static const uint8_t ESC_BYTE_ = 0x7D;
   static const uint8_t INVERT_BYTE_ = 0x20;

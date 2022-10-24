@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.2.0
+- Removed std::array and changed std::size_t to size_t to support Arduino AVR
+
 ## v3.1.1
 - Updated CMake minimum version to 3.14 to support FetchContent_MakeAvailable
 - Updated checksum to v3.1.1
